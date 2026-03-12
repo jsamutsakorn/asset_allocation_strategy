@@ -4,3 +4,6 @@ anaconda_project/
 *.docx
 *.pyc
 .DS_Store
+Asset_allocation-checkpoint.ipynb
+log_returns-checkpoint.csv
+*.db
