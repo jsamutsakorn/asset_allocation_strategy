@@ -2,3 +2,5 @@
 .ipynb_checkpoints/
 anaconda_project/
 *.docx
+*.pyc
+.DS_Store
