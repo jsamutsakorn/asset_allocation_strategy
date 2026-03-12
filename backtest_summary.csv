@@ -1,5 +1,5 @@
-,Ann. Return (%),Ann. Volatility (%),Sharpe Ratio,Max Drawdown (%),Total Return (%)
-Max Sharpe,67.62,48.17,1.3,-65.99,26883.5
-Min Volatility,10.33,14.89,0.358,-29.23,151.03
-20% Target,20.27,16.77,0.911,-28.51,556.76
-SPY Benchmark,13.81,17.62,0.5,-33.72,239.57
+,Ann. Return (%),Ann. Volatility (%),Sharpe Ratio,Max Drawdown (%),Total Return (%),Portfolio Beta
+Max Sharpe,67.62,48.17,1.3,-65.99,269834884.04,1.741
+Min Volatility,10.33,14.89,0.358,-29.23,2510187.82,0.629
+20% Target,20.27,16.77,0.911,-28.51,6567471.06,0.793
+SPY Benchmark,13.81,17.62,0.5,-33.72,3395636.33,1.0
