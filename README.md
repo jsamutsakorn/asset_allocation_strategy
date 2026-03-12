@@ -100,10 +100,9 @@ risk-aware investor:
 ## Project Structure
 ```
 ├── Asset_allocation.ipynb # Full analysis notebook
-├── log_returns.csv # Saved log return series
-├── portfolio_weights.csv # Optimal weights per strategy
-├── backtestsummary.csv # Performance metrics table
-└── charts/ # Output visualisations
+├── Asset_allocation_overview # Report of the
+├── figures # ALL figures generated in the workflow
+└── csv # All csv files generated
 ```
 
 
