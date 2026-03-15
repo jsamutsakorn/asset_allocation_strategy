@@ -12,6 +12,13 @@ This project demonstrates a full quantitative portfolio management workflow:
 data collection, statistical modelling, portfolio optimization, and
 performance evaluation — built entirely in Python using real market data.
 
+The notebook:
+- Builds an equity universe of 9 U.S. stocks plus SPY.
+- Estimates expected returns and covariance using daily data.
+- Solves three Markowitz-style optimization problems (Max Sharpe, Min Vol, 20% Target).
+- Back-tests each portfolio vs. SPY from 2015–2025.
+- Produces tables and charts for inclusion in a report or slide deck.
+
 ---
 
 ## Universe
@@ -27,93 +34,130 @@ Nine U.S. equities spanning defensive and growth sectors:
 | ADM    | Agriculture         | Food/crop price exposure      | 0.54        |
 | MSFT   | Large-Cap Tech      | Cloud & AI growth platform    | 0.60        |
 | ADBE   | Software            | High-margin subscription SaaS | 1.23        |
-| AMAT   | Semiconductors      | Chip equipment ("picks & shovels") | 0.39   |
+| AMAT   | Semiconductors      | Chip equipment (“picks & shovels”) | 0.39   |
 | NVDA   | AI Chips            | High-beta AI growth engine    | 1.75        |
+
+(Betas vs. SPY are estimated over the 2015–2025 sample.) [file:218]
 
 ---
 
 ## Methodology
 
 ### Data Collection
-- Downloaded 10 years of daily adjusted close prices (2015–2025) via `yfinance`
-- Computed daily **log returns** for statistical modelling
+
+- Download 10 years of daily adjusted close prices (2015–2025) via `yfinance`.
+- Compute daily **log returns** for all assets and the SPY benchmark. [file:218]
 
 ### Portfolio Statistics
-- Calculated annualized expected returns and a **9×9 covariance matrix**
-- Implemented a custom `portfolio_stats()` function (return, volatility, Sharpe)
-- Simulated **10,000 random portfolios** to approximate the efficient frontier
+
+- Compute annualized expected returns from daily mean returns. [file:218]
+- Compute the **9×9 covariance matrix** of daily returns and annualize it. [file:218]
+- Implement a reusable `portfolio_stats()` helper to return:
+  - Annualized return
+  - Annualized volatility
+  - Sharpe ratio (using a 5% risk-free rate) [file:218]
+- Simulate **10,000 random portfolios** to approximate the efficient frontier. [file:218]
 
 ### Mean-Variance Optimization (MVO)
-- Used `PyPortfolioOpt` with **Ledoit-Wolf shrinkage** covariance for robustness
-- Solved three optimization problems:
-  - **Max Sharpe** — maximises risk-adjusted return (5% risk-free rate)
-  - **Min Volatility** — minimises total portfolio variance
-  - **20% Target Return** — minimises risk subject to ≥20% annual return
-- Also implemented MVO from scratch using `scipy.optimize`
+
+- Use `PyPortfolioOpt` with **Ledoit–Wolf shrinkage** covariance for robustness. [file:218]
+- Solve three optimization problems:
+
+  1. **Max Sharpe**
+     - Maximizes risk-adjusted return (Sharpe ratio) subject to long-only, fully invested weights. [file:218]
+  2. **Min Volatility**
+     - Minimizes total portfolio variance under the same long-only constraint. [file:218]
+  3. **20% Target Return**
+     - Minimizes volatility subject to a 20% annual target return; falls back gracefully if target is infeasible. [file:218]
+
+- Re-implement the efficient frontier from scratch with `scipy.optimize.minimize`
+  (SLSQP) as a validation of the PyPortfolioOpt solutions. [file:218]
 
 ### Back-test & Performance Evaluation
-- Applied static weights to daily returns (2015–2025)
-- Computed key metrics vs. SPY benchmark:
+
+- Apply static optimal weights to daily returns over 2015–2025. [file:218]
+- Compute:
+
+  - Annualized return
+  - Annualized volatility
+  - Sharpe ratio (5% risk-free)
+  - Maximum drawdown
+  - Total cumulative return
+  - Portfolio beta vs. SPY [file:218]
+
+- Compare all three optimized portfolios vs. SPY:
 
 | Portfolio      | Ann. Return | Ann. Volatility | Sharpe | Max Drawdown | Beta |
 |----------------|-------------|-----------------|--------|--------------|------|
-| Max Sharpe     | 67.62%      | 48.17%          | 1.30   | -65.99%      | 1.74 |
-| Min Volatility | 10.33%      | 14.89%          | 0.36   | -29.23%      | 0.63 |
-| 20% Target     | 20.27%      | 16.77%          | 0.91   | -28.51%      | 0.79 |
+| Max Sharpe     | 43.07%      | 31.28%          | 1.22   | -41.83%      | 1.35 |
+| Min Volatility | 15.34%      | 21.96%          | 0.47   | -29.86%      | 1.05 |
+| 20% Target     | 26.06%      | 23.76%          | 0.89   | -32.19%      | 1.17 |
 | SPY Benchmark  | 13.81%      | 17.62%          | 0.50   | -33.72%      | 1.00 |
 
-### Visualisation
-- Efficient frontier with optimal portfolio overlays
-- Cumulative return curves (2015–2025)
-- Annual return bar charts by year
-- Individual asset volatility vs. portfolio volatility (diversification effect)
-- Portfolio weight allocation heatmaps
+(Values shown above are rounded to two decimals for readability.) [file:218]
+
+---
+
+## Visualisation
+
+The notebook generates several publication-ready figures: [file:218]
+
+- **Efficient frontier cloud** of 10,000 random portfolios, colored by Sharpe ratio.
+- **Optimal portfolio overlay** highlighting:
+  - Max Sharpe (annotated off-chart if necessary)
+  - Min Volatility
+  - 20% Target Return [file:218]
+- **Cumulative performance curves** (2015–2025) for all three portfolios vs. SPY.
+- **Annual returns bar chart** by year to show path dependency. [file:218]
+- **Portfolio weights** table and/or heatmap showing concentration risk
+  (e.g., NVDA in the Max Sharpe solution). [file:218]
+
+All figures are saved into a `figures/` directory for easy export to reports or slide decks. [file:218]
 
 ---
 
 ## Key Finding
 
-The **20% Target Return portfolio** is the most practical choice for a
-risk-aware investor:
-- Sits on the efficient frontier
-- Delivers **~47% more return than SPY** (20.3% vs 13.8%)
-- Maintains **lower volatility and drawdown** than SPY
-- Keeps **beta below 1.0** (0.79), reducing market sensitivity
-- Avoids the extreme NVDA concentration of the Max Sharpe portfolio
+The **20% Target Return portfolio** emerges as the most practical choice for a
+risk-aware investor: [file:218]
+
+- Sits cleanly on the efficient frontier. [file:218]
+- Delivers **~89% more return than SPY** (26.1% vs 13.8% annualized). [file:218]
+- Accepts **higher volatility and drawdown than SPY**, but with a much stronger
+  risk‑adjusted profile (Sharpe ≈ 0.89 vs 0.50). [file:218]
+- Maintains **beta modestly above 1.0** (~1.17), keeping market sensitivity
+  reasonable. [file:218]
+- Avoids the extreme NVDA concentration and higher tail risk of the Max Sharpe
+  portfolio. [file:218]
 
 ---
 
 ## Tech Stack
 
-| Library        | Purpose                              |
-|----------------|--------------------------------------|
-| `yfinance`     | Market data download                 |
-| `pandas`       | Data manipulation                    |
-| `numpy`        | Numerical computation                |
-| `scipy`        | Custom MVO solver                    |
-| `PyPortfolioOpt` | Efficient frontier & shrinkage     |
-| `matplotlib`   | Visualisation                        |
-| `seaborn`      | Heatmaps & styled charts             |
+| Library         | Purpose                                 |
+|-----------------|-----------------------------------------|
+| `yfinance`      | Market data download                    |
+| `pandas`        | Data manipulation and time series       |
+| `numpy`         | Numerical computation                   |
+| `scipy`         | Custom MVO solver (SLSQP)               |
+| `PyPortfolioOpt`| Efficient frontier & robust covariances |
+| `matplotlib`    | Core visualizations                     |
+| `seaborn`       | Heatmaps & styled charts                |
 
 ---
 
 ## Project Structure
-```
-├── Asset_allocation.ipynb # Full analysis notebook
-├── Asset_allocation_overview # Report of the
-├── figures # ALL figures generated in the workflow
-└── csv # All csv files generated
-```
 
+```text
+├── Asset_allocation.ipynb        # Main analysis and optimization workflow
+├── Asset_allocation_overview.pdf # Slide/report-style overview
+├── figures/                      # All generated charts (PNG)
+└── csv/                          # Exported CSV data (returns, covariances, etc.)
 
----
+--- 
 
-## How to Run
-
-```bash
-pip install yfinance PyPortfolioOpt pandas numpy scipy matplotlib seaborn
-jupyter notebook Asset_allocation.ipynb
-```
-
-## Author: Jiraphat Samutsakorn
-This project was built as a quantitative finance portfolio project demonstrating skills in financial data analysis, portfolio theory, and Python-based modelling.
+Author
+Jiraphat Samutsakorn
+This project serves as a quantitative finance portfolio project, demonstrating
+skills in data handling, portfolio theory, optimization, and Python-based
+back-testing.
